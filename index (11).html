@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vanessa Rosa · Apartamento, viagens e independência financeira</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg-deep:#0A0C1A;--bg-card:#0F1225;--bg-elevated:#141728;--navy:#1E2761;--gold:#C9A84C;--gold-light:#E8C97A;--text-primary:#F0EDE6;--text-muted:#8B8FA8;--success:#4CAF8C;--warning:#E8A83C;--danger:#E85C4A;--border:rgba(201,168,76,0.15)}
+html{scroll-behavior:smooth}
+body{background:var(--bg-deep);color:var(--text-primary);font-family:'DM Sans',-apple-system,sans-serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:var(--gold)}
+button:focus-visible,input:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--gold-light);outline-offset:3px}
+#password-overlay{position:fixed;inset:0;background:var(--bg-deep);z-index:9999;display:flex;align-items:center;justify-content:center;background-image:radial-gradient(ellipse at 50% 0%,rgba(30,39,97,.55) 0%,transparent 65%)}
+.pw-box{text-align:center;padding:2rem}
+.pw-mark{font-family:'Playfair Display',serif;font-size:2.4rem;color:var(--gold);margin-bottom:.4rem}
+.pw-title{font-family:'Playfair Display',serif;font-size:1.35rem;margin-bottom:.35rem}
+.pw-sub{font-size:.9rem;color:var(--text-muted);margin-bottom:2rem}
+#pwd-input{background:var(--bg-elevated);border:1px solid rgba(201,168,76,.3);color:var(--text-primary);padding:.8rem 1.25rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:1rem;width:260px;max-width:80vw;text-align:center}
+.pw-btn{margin-top:1.1rem;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--bg-deep);border:none;padding:.8rem 2.2rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:1rem;cursor:pointer}
+#pwd-error{color:var(--danger);font-size:.85rem;margin-top:1rem;display:none}
+.section{max-width:960px;margin:0 auto;padding:5rem 2rem;border-bottom:1px solid var(--border)}
+.section-label{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem;font-weight:500}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(1.75rem,4vw,2.5rem);font-weight:400;line-height:1.2;margin-bottom:1rem}
+.section-intro{color:var(--text-muted);max-width:680px;margin-bottom:2.5rem;font-size:1.02rem}
+.section-intro strong{color:var(--text-primary);font-weight:500}
+.divider{width:48px;height:2px;background:linear-gradient(90deg,var(--gold),transparent);margin:0 0 1.6rem}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:4rem 2rem;background:radial-gradient(ellipse at 50% 0%,rgba(30,39,97,.45) 0%,transparent 70%),radial-gradient(ellipse at 80% 85%,rgba(201,168,76,.07) 0%,transparent 60%)}
+.hero-eyebrow{font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem}
+.hero-name{font-family:'Playfair Display',serif;font-size:clamp(2.8rem,7vw,5.2rem);font-weight:400;line-height:1.05;margin-bottom:1rem}
+.hero-meta{font-size:.92rem;color:var(--text-muted);margin-bottom:2.4rem}
+.hero-question{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(1.35rem,3vw,2rem);color:var(--gold-light);max-width:720px;line-height:1.4;margin-bottom:1.4rem}
+.hero-statement{font-size:1.05rem;color:var(--text-muted);max-width:620px}
+.scroll-hint{margin-top:3rem;font-size:.85rem;color:var(--text-muted);text-decoration:none;border-bottom:1px solid var(--border);padding-bottom:.2rem}
+.goals{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}
+.goal{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.5rem}
+.goal .when{font-family:'DM Mono',monospace;font-size:.85rem;color:var(--gold);margin-bottom:.4rem}
+.goal .t{font-family:'Playfair Display',serif;font-size:1.25rem;margin-bottom:.4rem}
+.goal p{font-size:.92rem;color:var(--text-muted)}
+.path{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.path-step{padding:1.4rem;background:var(--bg-card)}
+.path-step+.path-step{border-left:1px solid var(--border)}
+.path-step .k{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.35rem}
+.path-step p{font-size:.92rem;color:var(--text-muted)}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin:0 0 2.5rem}
+.metric-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.4rem}
+.metric-label{font-size:.8rem;color:var(--text-muted);margin-bottom:.45rem}
+.metric-value{font-family:'DM Mono',monospace;font-size:1.6rem;color:var(--gold);font-weight:500;line-height:1.2}
+.metric-sub{font-size:.82rem;color:var(--text-muted);margin-top:.35rem}
+.metric-card.alert .metric-value{color:var(--warning)}
+.metric-card.bad .metric-value{color:var(--danger)}
+.metric-card.good .metric-value{color:var(--success)}
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--bg-card);margin-bottom:1.2rem}
+table{width:100%;border-collapse:collapse;font-size:.93rem;min-width:560px}
+th{text-align:left;font-weight:500;color:var(--text-muted);font-size:.8rem;padding:.9rem 1.1rem;border-bottom:1px solid var(--border);background:var(--bg-elevated)}
+td{padding:.85rem 1.1rem;border-bottom:1px solid rgba(201,168,76,.07);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-family:'DM Mono',monospace;white-space:nowrap}
+tr.total td{background:rgba(201,168,76,.06);font-weight:600}
+tr.total td.num{color:var(--gold)}
+tr.hl td{background:rgba(232,92,74,.07)}
+.neg{color:var(--danger)}.pos{color:var(--success)}.warn{color:var(--warning)}
+.note{font-size:.85rem;color:var(--text-muted);max-width:740px}
+.chart-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.6rem;margin:1.5rem 0}
+.chart-card h3{font-family:'Playfair Display',serif;font-weight:400;font-size:1.2rem;margin-bottom:.3rem}
+.chart-card .cap{font-size:.86rem;color:var(--text-muted);margin-bottom:1.2rem}
+.chart-box{position:relative;height:320px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:center}
+.finding-item{display:flex;gap:1.1rem;align-items:flex-start;padding:1.3rem 1.4rem;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;margin-bottom:.8rem}
+.finding-badge{font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:.3rem .75rem;border-radius:20px;white-space:nowrap;flex-shrink:0;min-width:92px;text-align:center}
+.badge-success{background:rgba(76,175,140,.15);color:var(--success);border:1px solid rgba(76,175,140,.3)}
+.badge-warning{background:rgba(232,168,60,.15);color:var(--warning);border:1px solid rgba(232,168,60,.3)}
+.badge-danger{background:rgba(232,92,74,.15);color:var(--danger);border:1px solid rgba(232,92,74,.3)}
+.finding-title{font-weight:600;margin-bottom:.3rem;font-size:1.02rem}
+.finding-desc{color:var(--text-muted);font-size:.95rem}
+.finding-desc strong{color:var(--text-primary);font-weight:500}
+.big-quote{border-left:3px solid var(--gold);padding:1.4rem 1.6rem;background:linear-gradient(90deg,rgba(201,168,76,.08),transparent);border-radius:0 12px 12px 0;margin:2rem 0}
+.big-quote p{font-family:'Playfair Display',serif;font-size:clamp(1.2rem,2.6vw,1.6rem);line-height:1.4}
+.big-quote span{display:block;font-size:.9rem;color:var(--text-muted);margin-top:.6rem;font-family:'DM Sans',sans-serif}
+.verdict{border:1px solid rgba(232,168,60,.4);background:linear-gradient(135deg,rgba(232,168,60,.08),rgba(30,39,97,.25));border-radius:16px;padding:2.2rem 2rem;margin-top:2rem}
+.verdict .k{font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--warning);margin-bottom:.6rem;font-weight:600}
+.verdict h3{font-family:'Playfair Display',serif;font-weight:400;font-size:clamp(1.4rem,3vw,1.9rem);line-height:1.3;margin-bottom:.9rem}
+.verdict p{color:var(--text-muted);max-width:720px}
+.verdict p+p{margin-top:.8rem}
+.options{display:grid;gap:.9rem}
+.option{display:grid;grid-template-columns:auto 1fr auto;gap:1.2rem;align-items:start;background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.4rem}
+.option .n{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--gold);line-height:1}
+.option .t{font-family:'Playfair Display',serif;font-size:1.15rem;margin-bottom:.3rem}
+.option p{font-size:.92rem;color:var(--text-muted)}
+.tag{font-size:.75rem;font-weight:600;padding:.3rem .75rem;border-radius:20px;white-space:nowrap}
+.tag.g{background:rgba(76,175,140,.15);color:var(--success)}
+.tag.y{background:rgba(232,168,60,.15);color:var(--warning)}
+.tag.r{background:rgba(232,92,74,.15);color:var(--danger)}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin-top:1rem}
+.rule{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.4rem}
+.rule .t{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:.4rem;color:var(--gold-light)}
+.rule p{font-size:.92rem;color:var(--text-muted)}
+details.acc{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;margin-top:1rem}
+details.acc summary{cursor:pointer;padding:1.1rem 1.4rem;font-weight:500;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:1rem}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary::after{content:'+';color:var(--gold);font-size:1.3rem;font-family:'DM Mono',monospace}
+details.acc[open] summary::after{content:'−'}
+details.acc .acc-body{padding:0 1.4rem 1.4rem;color:var(--text-muted);font-size:.94rem}
+details.acc .acc-body p{margin-bottom:.8rem}
+.timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.phase{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;border-top:3px solid var(--gold)}
+.phase:nth-child(2){border-top-color:var(--gold-light)}
+.phase:nth-child(3){border-top-color:var(--navy)}
+.phase-badge{font-family:'Playfair Display',serif;font-size:1.25rem}
+.phase-range{font-size:.82rem;color:var(--text-muted);margin-bottom:1.1rem}
+.action-item{display:flex;gap:.7rem;padding:.75rem 0;border-top:1px solid rgba(201,168,76,.08);cursor:pointer}
+.action-item input{accent-color:var(--gold);margin-top:.3rem;flex-shrink:0;width:16px;height:16px;cursor:pointer}
+.action-title{font-size:.93rem}
+.action-who{font-size:.78rem;color:var(--text-muted);margin-top:.15rem}
+.action-item.done .action-title{text-decoration:line-through;color:var(--text-muted)}
+.progress{margin-top:1.5rem;display:flex;align-items:center;gap:1rem;font-size:.88rem;color:var(--text-muted)}
+.progress-bar{flex:1;height:6px;background:var(--bg-elevated);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold-light));transition:width .3s}
+.next{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem}
+.next-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1.4rem}
+.next-card h4{font-family:'Playfair Display',serif;font-weight:400;font-size:1.1rem;margin-bottom:.6rem;color:var(--gold-light)}
+.next-card ul{list-style:none}
+.next-card li{font-size:.93rem;color:var(--text-muted);padding:.35rem 0 .35rem 1.1rem;position:relative}
+.next-card li::before{content:'';position:absolute;left:0;top:.85rem;width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.cta{display:inline-block;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--bg-deep);text-decoration:none;font-weight:600;padding:.95rem 2rem;border-radius:10px}
+footer{text-align:center;padding:4rem 2rem 5rem;background:radial-gradient(ellipse at 50% 100%,rgba(30,39,97,.35),transparent 70%)}
+.footer-logo{font-family:'Playfair Display',serif;font-size:2rem;color:var(--gold);margin-bottom:.6rem}
+.footer-name{font-family:'Playfair Display',serif;font-size:1.2rem}
+.footer-title,.footer-brand,.footer-contact{font-size:.88rem;color:var(--text-muted)}
+.footer-disclaimer{max-width:660px;margin:1.8rem auto 0;font-size:.78rem;color:var(--text-muted);opacity:.85}
+@media (max-width:760px){
+  .section{padding:3.4rem 1.25rem}
+  .goals,.path,.timeline,.next,.two-col{grid-template-columns:1fr}
+  .path-step+.path-step{border-left:none;border-top:1px solid var(--border)}
+  .metric-grid{grid-template-columns:1fr 1fr}
+  .metric-value{font-size:1.2rem}
+  .finding-item{flex-direction:column;gap:.6rem}
+  .option{grid-template-columns:auto 1fr}
+  .option .tag{grid-column:2;justify-self:start}
+  .chart-box{height:280px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<div id="password-overlay">
+  <div class="pw-box">
+    <div class="pw-mark">MM</div>
+    <div class="pw-title">Planejamento Financeiro</div>
+    <div class="pw-sub">Vanessa Rosa, outubro de 2026</div>
+    <input id="pwd-input" type="password" placeholder="Senha de acesso" aria-label="Senha de acesso" autocomplete="off">
+    <br>
+    <button class="pw-btn" onclick="checkPassword()">Acessar</button>
+    <div id="pwd-error">Senha incorreta. Confira a senha enviada no WhatsApp.</div>
+  </div>
+</div>
+
+<div id="main-content" style="display:none">
+
+<section class="hero">
+  <div class="hero-eyebrow">Análise de decisão patrimonial</div>
+  <h1 class="hero-name">Vanessa Rosa</h1>
+  <div class="hero-meta">Uberlândia, outubro de 2026. Elaborado por Matheus Melo, Financial Advisor Master</div>
+  <p class="hero-question">“O apartamento cabe no seu bolso. A pergunta é se ele cabe nos seus 50 anos.”</p>
+  <p class="hero-statement">Cruzamos a nova proposta da construtora com o seu fluxo mensal, a sua carteira, as viagens para a Europa e a sua meta de independência financeira. Aqui está o retrato completo para você decidir com clareza.</p>
+  <a class="scroll-hint" href="#objetivos">Começar a leitura</a>
+</section>
+
+<!-- OBJETIVOS -->
+<section class="section" id="objetivos">
+  <div class="section-label">Seus objetivos</div>
+  <h2 class="section-title">Três sonhos disputando o mesmo dinheiro</h2>
+  <div class="divider"></div>
+  <p class="section-intro">Cada um deles é legítimo. O trabalho do planejamento é mostrar quanto cada escolha custa nas outras, para que a decisão seja sua e consciente.</p>
+  <div class="goals">
+    <div class="goal"><div class="when">Jan/2030</div><div class="t">O apartamento novo</div><p>Unidade 503, 105 m², em bairro planejado, comprada em pré-lançamento.</p></div>
+    <div class="goal"><div class="when">Mai/2027 e mai/2029</div><div class="t">Duas viagens à Europa</div><p>Cerca de R$ 30 mil cada, pelo orçamento atual.</p></div>
+    <div class="goal"><div class="when">Aos 50 anos</div><div class="t">Independência financeira</div><p>Renda de R$ 10 mil por mês, com patrimônio de cerca de R$ 2,6 milhões.</p></div>
+  </div>
+  <div class="path">
+    <div class="path-step"><div class="k">Objetivo</div><p>Primeiro definimos o que importa e quando.</p></div>
+    <div class="path-step"><div class="k">Estratégia</div><p>Depois, como o dinheiro se divide entre os objetivos.</p></div>
+    <div class="path-step"><div class="k">Produto</div><p>Só então o imóvel, os investimentos e o financiamento.</p></div>
+  </div>
+</section>
+
+<!-- SITUAÇÃO -->
+<section class="section">
+  <div class="section-label">Sua situação hoje</div>
+  <h2 class="section-title">O patrimônio existe. O desafio é o prazo.</h2>
+  <div class="divider"></div>
+  <p class="section-intro">Você tem quase R$ 400 mil investidos e um apartamento quitado. Mas boa parte dos investimentos só vira dinheiro em datas específicas, e algumas delas são depois da entrega do imóvel.</p>
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-label">Investimentos (XP)</div><div class="metric-value">R$ 391 mil</div><div class="metric-sub">Posição de setembro/2026</div></div>
+    <div class="metric-card"><div class="metric-label">Apartamento atual</div><div class="metric-value">R$ 400 mil</div><div class="metric-sub">Quitado</div></div>
+    <div class="metric-card"><div class="metric-label">Custo de vida mensal</div><div class="metric-value">R$ 11.876</div><div class="metric-sub">Base da reserva</div></div>
+    <div class="metric-card"><div class="metric-label">Sobra mensal (meta)</div><div class="metric-value">R$ 7.000</div><div class="metric-sub">Capacidade de investir</div></div>
+    <div class="metric-card alert"><div class="metric-label">Dinheiro disponível hoje</div><div class="metric-value">R$ 36 mil</div><div class="metric-sub">≈ 3 meses de custo de vida</div></div>
+    <div class="metric-card alert"><div class="metric-label">Reserva ideal (6 meses)</div><div class="metric-value">R$ 71 mil</div><div class="metric-sub">Ainda não formada</div></div>
+  </div>
+  <div class="chart-card">
+    <div class="two-col">
+      <div>
+        <h3>Quando o seu dinheiro fica disponível</h3>
+        <p class="cap">A carteira separada pela data em que cada investimento vira dinheiro sem perda.</p>
+        <div class="table-wrap" style="margin:0"><table style="min-width:0"><tbody>
+          <tr><td>Disponível hoje<br><span class="note">Tesouro Selic, caixa, ações e FIIs listados</span></td><td class="num">R$ 36 mil</td></tr>
+          <tr><td>Vence até a entrega<br><span class="note">LCAs, CDBs curtos, COEs Cripto e Bolsa Americana 2029, operações com opções</span></td><td class="num">R$ 143 mil</td></tr>
+          <tr><td>Vence em 2030, logo após a entrega<br><span class="note">COEs Eletrobras e Bolsa Americana 63%, CDB Digimais</span></td><td class="num">R$ 75 mil</td></tr>
+          <tr><td>Longo prazo ou baixa liquidez<br><span class="note">FIIs feeder, COEs Minerva e MAXP, CRA BRF</span></td><td class="num">R$ 137 mil</td></tr>
+        </tbody></table></div>
+      </div>
+      <div class="chart-box"><canvas id="liquidityChart" aria-label="Gráfico de liquidez da carteira"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROPOSTA -->
+<section class="section">
+  <div class="section-label">A nova proposta</div>
+  <h2 class="section-title">40% durante a obra, 60% na entrega</h2>
+  <div class="divider"></div>
+  <p class="section-intro">A construtora reorganizou o pagamento: a obra ficou bem mais leve e o peso foi para as chaves. É a direção certa, e muda a análise.</p>
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-label">Valor do apartamento</div><div class="metric-value">R$ 848,2 mil</div><div class="metric-sub">R$ 8.078/m², contra R$ 9.000/m² no lançamento</div></div>
+    <div class="metric-card good"><div class="metric-label">Desconto sobre o lançamento</div><div class="metric-value">≈ R$ 97 mil</div><div class="metric-sub">Expectativa, não ganho realizado</div></div>
+    <div class="metric-card"><div class="metric-label">Durante a obra</div><div class="metric-value">R$ 339,3 mil</div><div class="metric-sub">40% do valor</div></div>
+    <div class="metric-card"><div class="metric-label">Na entrega (jan/2030)</div><div class="metric-value">R$ 508,9 mil</div><div class="metric-sub">60% do valor</div></div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Quando</th><th>O quê</th><th class="num">Valor</th></tr></thead>
+      <tbody>
+        <tr><td>Agora</td><td>Sinal</td><td class="num">R$ 50.000</td></tr>
+        <tr><td>Jan–fev/2027</td><td>Pagamento no lançamento</td><td class="num">R$ 50.000</td></tr>
+        <tr><td>Out/2026 a jan/2030</td><td>40 parcelas de R$ 3.000</td><td class="num">R$ 120.000</td></tr>
+        <tr><td>Anuais (datas a confirmar)</td><td>3 balões de R$ 39.760</td><td class="num">R$ 119.280</td></tr>
+        <tr class="total"><td colspan="2">Total durante a obra</td><td class="num">R$ 339.280</td></tr>
+        <tr><td>Jan/2030</td><td>Saldo na entrega</td><td class="num">R$ 508.920</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <details class="acc">
+    <summary>Comparação com a primeira proposta</summary>
+    <div class="acc-body">
+      <div class="table-wrap"><table>
+        <thead><tr><th></th><th>Primeira proposta</th><th>Nova proposta</th></tr></thead>
+        <tbody>
+          <tr><td>Pago durante a obra</td><td>R$ 420 mil</td><td>R$ 339 mil</td></tr>
+          <tr><td>Situação na obra</td><td class="neg">Faltariam ~R$ 140 mil</td><td class="pos">Cabe, com folga</td></tr>
+          <tr><td>Reserva de emergência</td><td class="neg">Consumida por 3 anos</td><td class="pos">Reconstruída até jan/2029</td></tr>
+          <tr><td>A cobrir na entrega</td><td>~R$ 150–170 mil</td><td class="warn">~R$ 230–245 mil</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </details>
+</section>
+
+<!-- OBRA + VIAGENS -->
+<section class="section">
+  <div class="section-label">Obra e viagens</div>
+  <h2 class="section-title">A obra cabe. O primeiro semestre de 2027 é o ponto crítico.</h2>
+  <div class="divider"></div>
+  <p class="section-intro">Com a parcela de R$ 3.000, sobram <strong>R$ 4.000 por mês</strong> para os balões. Somando os investimentos que vencem no caminho, a obra se paga e ainda reconstrói a sua reserva. O aperto está no começo: <strong>R$ 100 mil em quatro meses</strong> (sinal e lançamento), seguidos da viagem de maio/2027.</p>
+  <div class="chart-card">
+    <h3>Sua reserva livre ao longo da obra</h3>
+    <p class="cap">Depois de pagar a construtora e as viagens, sem considerar a correção pelo INCC. A linha pontilhada é a reserva ideal de 6 meses.</p>
+    <div class="chart-box"><canvas id="reserveChart" aria-label="Gráfico da reserva ao longo da obra"></canvas></div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Momento</th><th>O que acontece</th><th class="num">Reserva depois</th></tr></thead>
+      <tbody>
+        <tr><td>Hoje</td><td>Tesouro Selic e caixa</td><td class="num">R$ 32 mil</td></tr>
+        <tr><td>Out/26 a jan/27</td><td>Sinal e pagamento do lançamento: R$ 100 mil</td><td class="num">R$ 9 mil</td></tr>
+        <tr class="hl"><td>Maio/2027</td><td>Viagem à Europa: R$ 30 mil</td><td class="num neg">− R$ 4 mil</td></tr>
+        <tr><td>Até jan/2028</td><td>COE Cripto e opções vencem; 1º balão pago</td><td class="num">R$ 41 mil</td></tr>
+        <tr><td>Até jan/2029</td><td>Opção BPAC11 vence; 2º balão pago</td><td class="num pos">R$ 75 mil</td></tr>
+        <tr><td>Maio/2029</td><td>Viagem à Europa: R$ 30 mil</td><td class="num">R$ 62 mil</td></tr>
+        <tr><td>Jan/2030</td><td>COE Bolsa Americana 2029 vence; 3º balão pago</td><td class="num">R$ 64 mil</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Com a correção pelo INCC sobre parcelas e balões, a reserva na entrega fica mais perto de R$ 35 a 40 mil. Consideramos os balões anuais em janeiro de 2028, 2029 e 2030; as datas exatas ainda precisam ser confirmadas.</p>
+</section>
+
+<!-- ENTREGA -->
+<section class="section">
+  <div class="section-label">A entrega das chaves</div>
+  <h2 class="section-title">O desafio mudou de lugar</h2>
+  <div class="divider"></div>
+  <p class="section-intro">O saldo de R$ 508,9 mil tende a ser corrigido durante a obra. A venda do seu apartamento atual cobre a maior parte, mas não tudo.</p>
+  <div class="chart-card">
+    <h3>A conta de janeiro de 2030</h3>
+    <p class="cap">Estimativa com correção pelo INCC em torno de 6% ao ano e corretagem de 6% na venda.</p>
+    <div class="chart-box" style="height:230px"><canvas id="keysChart" aria-label="Gráfico da conta da entrega"></canvas></div>
+  </div>
+  <div class="metric-grid">
+    <div class="metric-card bad"><div class="metric-label">Financiando tudo</div><div class="metric-value">≈ R$ 3.400/mês</div><div class="metric-sub">Parcela inicial estimada, 20 anos</div></div>
+    <div class="metric-card good"><div class="metric-label">Com parcelas pós-chaves até set/2030</div><div class="metric-value">≈ R$ 2.100/mês</div><div class="metric-sub">Usando os ~R$ 88 mil que vencem em 2030</div></div>
+  </div>
+  <p class="note">Estimativas no sistema SAC com juros de ~1% ao mês. Taxas e aprovação dependem do banco em 2030.</p>
+</section>
+
+<!-- INDEPENDÊNCIA -->
+<section class="section">
+  <div class="section-label">Independência financeira</div>
+  <h2 class="section-title">O preço que não aparece na tabela da construtora</h2>
+  <div class="divider"></div>
+  <p class="section-intro">Hoje você está praticamente no caminho da sua meta. Com o apartamento, toda a sua sobra vai para os projetos por 40 meses, e depois uma parte dela vai para o financiamento. Esse é o custo real da decisão.</p>
+  <div class="chart-card">
+    <h3>Patrimônio para a independência aos 50 anos</h3>
+    <p class="cap">Juro real de 4% ao ano, as duas viagens incluídas em todos os cenários. A linha dourada é a sua meta de R$ 2,6 milhões.</p>
+    <div class="chart-box"><canvas id="fiChart" aria-label="Gráfico de patrimônio aos 50 anos por cenário"></canvas></div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Cenário</th><th class="num">Patrimônio aos 50</th><th class="num">Renda possível até os 90</th><th class="num">Idade da meta</th></tr></thead>
+      <tbody>
+        <tr><td>Sem o apartamento</td><td class="num">R$ 2,36 mi</td><td class="num pos">R$ 9.800</td><td class="num pos">~51 anos</td></tr>
+        <tr><td>Com o apartamento, parcela de ~R$ 2.100</td><td class="num">R$ 1,22 mi</td><td class="num warn">R$ 5.000</td><td class="num warn">~61 anos</td></tr>
+        <tr><td>Com o apartamento, parcela de ~R$ 3.400</td><td class="num">R$ 0,96 mi</td><td class="num neg">R$ 4.000</td><td class="num neg">~65 anos</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="big-quote">
+    <p>Na prática, o apartamento troca a independência aos 50 por uma independência entre 61 e 65 anos, ou por metade da renda aos 50.</p>
+    <span>Para manter os 50 anos e os R$ 10 mil, seria preciso investir cerca de R$ 12 mil por mês a partir de 2030.</span>
+  </div>
+  <p class="note">O patrimônio não desaparece: ele muda de forma e vira um imóvel de cerca de R$ 850 mil. Mas um imóvel onde você mora não paga suas contas na aposentadoria. Ele só ajuda nesse objetivo se houver um plano para ele, como trocar por um imóvel menor aos 50. Os cálculos não incluem o aumento de condomínio e IPTU do imóvel novo nem a queda natural da parcela no SAC.</p>
+</section>
+
+<!-- DIAGNÓSTICO -->
+<section class="section">
+  <div class="section-label">Diagnóstico</div>
+  <h2 class="section-title">O que encontramos</h2>
+  <div class="divider"></div>
+
+  <div class="finding-item"><div class="finding-badge badge-success">Positivo</div><div><div class="finding-title">A obra agora cabe no seu fluxo</div><div class="finding-desc">Com a nova proposta, sua sobra e os investimentos que vencem no caminho pagam a obra e ainda reconstroem a reserva de 6 meses até janeiro de 2029.</div></div></div>
+
+  <div class="finding-item"><div class="finding-badge badge-success">Positivo</div><div><div class="finding-title">Parte da carteira vence logo após a entrega</div><div class="finding-desc">Entre junho e setembro de 2030 vencem <strong>cerca de R$ 88 mil</strong>. Com parcelas pós-chaves até setembro de 2030, o valor a financiar cai de ~R$ 240 mil para ~R$ 150 mil.</div></div></div>
+
+  <div class="finding-item"><div class="finding-badge badge-success">Positivo</div><div><div class="finding-title">Os COEs de Bolsa Americana valem mais do que o extrato mostra</div><div class="finding-desc">Mantidos até o vencimento, garantem pelo menos 63% e 68% no período. O de dezembro/2029 entrega no mínimo <strong>R$ 7,9 mil líquidos</strong> e o de setembro/2030, no mínimo <strong>R$ 32 mil líquidos</strong>.</div></div></div>
+
+  <div class="finding-item"><div class="finding-badge badge-warning">Atenção</div><div><div class="finding-title">R$ 100 mil em quatro meses, seguidos da viagem de 2027</div><div class="finding-desc">O sinal e o pagamento do lançamento consomem praticamente toda a sua liquidez, inclusive a reserva. A viagem de maio/2027 chega com a reserva zerada e faltariam cerca de R$ 4 mil.</div></div></div>
+
+  <div class="finding-item"><div class="finding-badge badge-warning">Atenção</div><div><div class="finding-title">A correção pelo INCC aumenta a conta</div><div class="finding-desc">Parcelas, balões e saldo tendem a ser reajustados durante a obra. Num cenário de ~6% ao ano, o saldo da entrega passa de R$ 509 mil para algo entre <strong>R$ 600 e 620 mil</strong>. É preciso confirmar o índice no contrato.</div></div></div>
+
+  <div class="finding-item"><div class="finding-badge badge-danger">Crítico</div><div><div class="finding-title">A independência financeira fica adiada de 10 a 14 anos</div><div class="finding-desc">Sem aportes por 40 meses e com o financiamento depois, o patrimônio aos 50 cai de <strong>R$ 2,36 milhões para R$ 1,0–1,2 milhão</strong>. Um financiamento de 20 anos assinado em 2030 ainda estaria sendo pago depois dos seus 50.</div></div></div>
+
+  <div class="finding-item"><div class="finding-badge badge-warning">Atenção</div><div><div class="finding-title">A carteira foi montada com produtos, não com objetivos</div><div class="finding-desc">Cerca de 20% está em COEs de prazos longos, dois deles com capital em risco. O único dinheiro que não vai para os projetos (~R$ 137 mil) ficou de fora por acaso, porque é ilíquido, e não por ter sido separado para a independência.</div></div></div>
+
+  <div class="verdict">
+    <div class="k">Conclusão</div>
+    <h3>A compra é viável. A decisão de verdade é sobre a sua idade de independência.</h3>
+    <p>A nova proposta resolveu o problema da obra: ela cabe no seu fluxo, com reserva e viagens. O risco foi para a entrega, que depende da venda do apartamento atual e de um financiamento em 2030.</p>
+    <p>O ponto central é outro: comprar este apartamento agora, sem nenhum ajuste, significa aceitar se aposentar perto dos 61 a 65 anos em vez dos 50. Isso pode fazer sentido para você, desde que seja uma escolha, e não uma consequência.</p>
+  </div>
+</section>
+
+<!-- CAMINHOS -->
+<section class="section">
+  <div class="section-label">Seus caminhos</div>
+  <h2 class="section-title">Cinco formas de decidir</h2>
+  <div class="divider"></div>
+  <p class="section-intro">Nenhuma delas é errada. Cada uma faz uma troca diferente entre o apartamento, as viagens e os seus 50 anos.</p>
+  <div class="options">
+    <div class="option"><div class="n">1</div><div><div class="t">Comprar e aceitar o adiamento</div><p>Segue a proposta atual e redefine a meta de independência para por volta dos 60 anos, com plena consciência da troca.</p></div><span class="tag y">Independência ~61</span></div>
+    <div class="option"><div class="n">2</div><div><div class="t">Comprar e planejar a troca aos 50</div><p>Aos 50, vender o apartamento maior e comprar um menor, liberando R$ 300 a 400 mil para a carteira. Recupera boa parte da diferença.</p></div><span class="tag g">Equilibrado</span></div>
+    <div class="option"><div class="n">3</div><div><div class="t">Comprar e quitar tudo antes dos 50</div><p>Parcelas pós-chaves até set/2030, financiamento com prazo curto e amortizações com os vencimentos da carteira. A independência recomeça mais cedo.</p></div><span class="tag g">Exige disciplina</span></div>
+    <div class="option"><div class="n">4</div><div><div class="t">Buscar uma unidade menor ou mais barata</div><p>No mesmo empreendimento, reduzindo o saldo da entrega e o financiamento.</p></div><span class="tag g">Reduz o impacto</span></div>
+    <div class="option"><div class="n">5</div><div><div class="t">Não comprar agora</div><p>Mantém a independência por volta dos 50–51 anos e as duas viagens. O imóvel pode ser reavaliado no lançamento ou já pronto.</p></div><span class="tag g">Independência ~51</span></div>
+  </div>
+
+  <h3 style="font-family:'Playfair Display',serif;font-weight:400;font-size:1.5rem;margin:3rem 0 .4rem">O que vale em qualquer caminho</h3>
+  <p class="note" style="margin-bottom:1rem">Se você decidir comprar, estas regras protegem o plano.</p>
+  <div class="rules">
+    <div class="rule"><div class="t">Ajustar o início</div><p>Negociar o sinal para cerca de R$ 30 mil, ou levar a viagem de 2027 para o segundo semestre, depois que o COE Cripto vence em agosto.</p></div>
+    <div class="rule"><div class="t">Reserva intocável</div><p>A reserva não paga balão nem viagem. A meta é chegar a 6 meses (R$ 71 mil) e não descer de 3 meses em nenhum momento.</p></div>
+    <div class="rule"><div class="t">Patrimônio da independência blindado</div><p>Os ~R$ 137 mil de longo prazo não entram nos projetos e serão reorganizados para esse objetivo.</p></div>
+    <div class="rule"><div class="t">Aporte mínimo, mesmo na obra</div><p>Cerca de R$ 500 por mês para a independência mantém o hábito vivo e reduz a distância da meta.</p></div>
+    <div class="rule"><div class="t">Caixinha Europa</div><p>Valor mensal separado para as viagens, com compra de euro aos poucos, longe dos meses de balão.</p></div>
+    <div class="rule"><div class="t">COEs até o vencimento</div><p>As garantias só valem no vencimento. Os de Bolsa Americana viram fonte previsível perto da entrega.</p></div>
+  </div>
+
+  <details class="acc">
+    <summary>O que cada um dos seus COEs entrega de fato</summary>
+    <div class="acc-body">
+      <p>Os valores mínimos só valem se o COE for mantido até o vencimento. Todos dependem da saúde financeira do Banco XP e não têm garantia do FGC. Nos COEs de crédito, dependem também da empresa de referência.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>COE</th><th class="num">Aplicado</th><th>Vencimento</th><th>O que garante no vencimento</th><th>Papel no plano</th></tr></thead>
+        <tbody>
+          <tr><td>XP Cripto</td><td class="num">R$ 10.000</td><td>ago/2027</td><td>R$ 10 mil de volta, podendo chegar a R$ 20 mil</td><td class="pos">Obra e reserva</td></tr>
+          <tr><td>Bolsa Americana (2024)</td><td class="num">R$ 5.000</td><td>dez/2029</td><td>Mínimo de 68% no período, ~R$ 7,9 mil líquidos</td><td class="pos">Antes da entrega</td></tr>
+          <tr><td>Bolsa Americana 63%</td><td class="num">R$ 21.000</td><td>set/2030</td><td>Mínimo de 63% no período, ~R$ 32 mil líquidos</td><td class="warn">8 meses após a entrega</td></tr>
+          <tr><td>Eletrobras 2030</td><td class="num">R$ 20.000</td><td>jun/2030</td><td>Cupons de ~R$ 690 por trimestre e R$ 20 mil no fim; capital em risco se a Eletrobras tiver problema de crédito</td><td class="warn">Cupons na obra, principal após a entrega</td></tr>
+          <tr><td>Minerva 2033</td><td class="num">R$ 10.000</td><td>set/2033</td><td>Paga tudo só em 2033; capital em risco, empresa com rating BB; o banco pode encerrar pagando 50% se o título da Minerva cair pela metade</td><td class="neg">Não serve para o imóvel</td></tr>
+          <tr><td>XP MAXP</td><td class="num">R$ 10.600</td><td>fev/2031</td><td>R$ 10,6 mil de volta; ganho depende de um índice próprio do mercado</td><td class="neg">Não serve para o imóvel</td></tr>
+        </tbody>
+      </table></div>
+      <p>Pelos documentos oficiais, o banco emissor pode remunerar a instituição que distribuiu cada COE em até 0,8% ao ano (0,5% nos de crédito), valor reconhecido já na emissão. Nesses seis produtos isso soma até cerca de R$ 2,5 mil. É uma prática permitida, e é importante que você saiba que ela existe.</p>
+    </div>
+  </details>
+</section>
+
+<!-- PLANO -->
+<section class="section" style="border-bottom:none">
+  <div class="section-label">Plano de ação</div>
+  <h2 class="section-title">Seus próximos 90 dias</h2>
+  <div class="divider"></div>
+  <div class="timeline">
+    <div class="phase">
+      <div class="phase-badge">Agora</div>
+      <div class="phase-range">Até 6 de novembro</div>
+      <label class="action-item"><input type="checkbox"><div><div class="action-title">Escolher, com calma, qual dos cinco caminhos faz sentido para você</div><div class="action-who">Responsável: Vanessa</div></div></label>
+      <label class="action-item"><input type="checkbox"><div><div class="action-title">Confirmar com a construtora as datas dos balões, o índice de correção e se o saldo pode ter parcelas pós-chaves até set/2030</div><div class="action-who">Responsável: Vanessa</div></div></label>
+      <label class="action-item"><input type="checkbox"><div><div class="action-title">Perguntar se o sinal pode ser de R$ 30 mil, com o restante em um balão posterior</div><div class="action-who">Responsável: Vanessa</div></div></label>
+      <label class="action-item"><input type="checkbox"><div><div class="action-title">Confirmar com a XP a situação do EMBJ3 e a liquidez dos fundos imobiliários feeder</div><div class="action-who">Responsável: Matheus</div></div></label>
+    </div>
+    <div class="phase">
+      <div class="phase-badge">Em seguida</div>
+      <div class="phase-range">Até 6 de dezembro</div>
+      <label class="action-item"><input type="checkbox"><div><div class="action-title">Obter a avaliação de mercado do apartamento atual</div><div class="action-who">Responsável: Vanessa</div></div></label>
+      <label class="action-item"><input type="checkbox"><div><div class="action-title">Simular o financiamento da entrega em pelo menos dois bancos, com prazo que termine antes dos 50</div><div class="action-who">Responsável: Matheus</div></div></label>
+      <label class="action-item"><input type="checkbox"><div><div class="action-title">Enviar os documentos das operações com opções (BPAC11, SMAL11, GOLD11 e EMBJ3)</div><div class="action-who">Responsável: Vanessa</div></div></label>
+      <label class="action-item"><input type="checkbox"><div><div class="action-title">Levantar condomínio e IPTU previstos para o imóvel novo</div><div class="action-who">Responsável: Vanessa</div></div></label>
+    </div>
+    <div class="phase">
+      <div class="phase-badge">Consolidação</div>
+      <div class="phase-range">Até 6 de janeiro</div>
+      <label class="action-item"><input type="checkbox"><div><div class="action-title">Recalcular a meta de independência com o caminho escolhido</div><div class="action-who">Responsável: Matheus</div></div></label>
+      <label class="action-item"><input type="checkbox"><div><div class="action-title">Separar a carteira em quatro caixinhas: reserva, imóvel, viagens e independência</div><div class="action-who">Responsável: Vanessa e Matheus</div></div></label>
+      <label class="action-item"><input type="checkbox"><div><div class="action-title">Revisar a carteira com foco em liquidez e objetivos, incluindo Minerva e MAXP, e conferir o perfil de investidor na XP</div><div class="action-who">Responsável: Matheus</div></div></label>
+      <label class="action-item"><input type="checkbox"><div><div class="action-title">Iniciar a caixinha Europa com compra gradual de euro</div><div class="action-who">Responsável: Vanessa</div></div></label>
+    </div>
+  </div>
+  <div class="progress"><span id="progress-text"></span><div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div></div>
+</section>
+
+<footer>
+  <div class="footer-logo">MM</div>
+  <div class="footer-name">Matheus Melo</div>
+  <div class="footer-title">Financial Advisor Master</div>
+  <div class="footer-brand">Grão | Grupo Primo</div>
+  <div class="footer-contact">@financasmatheus.melo</div>
+  <div class="footer-disclaimer">Documento confidencial, elaborado exclusivamente para Vanessa Rosa com base nas informações disponíveis em outubro de 2026: proposta da construtora (unidade 503), posição de investimentos na XP, documentos oficiais (DIE) dos COEs, custo de vida, sobra mensal e meta de independência informados. Projeções usam juro real de 4% ao ano; INCC, liquidação de operações com opções e condições de financiamento são estimativas e devem ser confirmadas antes de qualquer decisão.</div>
+</footer>
+</div>
+
+<script>
+const PASS='vanessa2026';
+let chartsReady=false;
+function checkPassword(){
+  const v=document.getElementById('pwd-input').value.trim().toLowerCase();
+  if(v===PASS){
+    document.getElementById('password-overlay').style.display='none';
+    document.getElementById('main-content').style.display='block';
+    if(!chartsReady){initCharts();chartsReady=true;}
+  }else{document.getElementById('pwd-error').style.display='block';}
+}
+document.getElementById('pwd-input').addEventListener('keypress',e=>{if(e.key==='Enter')checkPassword();});
+(function(){
+  const all=document.querySelectorAll('.action-item input');
+  const upd=()=>{const d=[...all].filter(c=>c.checked).length;
+    document.getElementById('progress-text').textContent=d+' de '+all.length+' ações concluídas';
+    document.getElementById('progress-fill').style.width=(d/all.length*100)+'%';};
+  all.forEach(cb=>cb.addEventListener('change',()=>{cb.closest('.action-item').classList.toggle('done',cb.checked);upd();}));
+  upd();
+})();
+
+function initCharts(){
+  if(typeof Chart==='undefined')return;
+  Chart.defaults.color='#8B8FA8';
+  Chart.defaults.font.family="'DM Sans', sans-serif";
+  const grid='rgba(201,168,76,0.08)';
+  const brl=v=>'R$ '+v.toLocaleString('pt-BR')+' mil';
+
+  new Chart(document.getElementById('liquidityChart'),{type:'doughnut',
+    data:{labels:['Disponível hoje','Vence até a entrega','Vence em 2030','Longo prazo'],
+      datasets:[{data:[36,143,75,137],backgroundColor:['#C9A84C','#1E2761','#E8C97A','#8B8FA8'],borderColor:'#0F1225',borderWidth:3}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'64%',plugins:{legend:{position:'bottom',labels:{padding:12,font:{size:12}}},tooltip:{callbacks:{label:c=>' '+c.label+': '+brl(c.parsed)}}}}});
+
+  new Chart(document.getElementById('reserveChart'),{type:'line',
+    data:{labels:['Hoje','Jan/27','Mai/27','Jan/28','Jan/29','Mai/29','Jan/30'],
+      datasets:[
+        {label:'Reserva livre',data:[32,9,-4,41,75,62,64],borderColor:'#C9A84C',backgroundColor:'rgba(201,168,76,.12)',fill:true,tension:.3,pointRadius:5,
+          pointBackgroundColor:[ '#C9A84C','#E8A83C','#E85C4A','#C9A84C','#4CAF8C','#C9A84C','#C9A84C']},
+        {label:'Reserva ideal (6 meses)',data:[71,71,71,71,71,71,71],borderColor:'#4CAF8C',borderDash:[6,6],pointRadius:0,fill:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+brl(c.parsed.y)}}},
+      scales:{y:{grid:{color:grid},ticks:{callback:v=>'R$ '+v+'k'}},x:{grid:{display:false}}}}});
+
+  new Chart(document.getElementById('keysChart'),{type:'bar',
+    data:{labels:['Saldo na entrega (com INCC)','Venda do apartamento (líquida)','Diferença a cobrir'],
+      datasets:[{data:[610,376,238],backgroundColor:['#1E2761','#C9A84C','#E85C4A'],borderRadius:6,barThickness:30}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' ≈ '+brl(c.parsed.x)}}},
+      scales:{x:{grid:{color:grid},ticks:{callback:v=>'R$ '+v+' mil'}},y:{grid:{display:false},ticks:{color:'#F0EDE6'}}}}});
+
+  new Chart(document.getElementById('fiChart'),{type:'bar',
+    data:{labels:['Sem o apartamento','Com apto (parcela ~R$ 2,1k)','Com apto (parcela ~R$ 3,4k)'],
+      datasets:[
+        {type:'bar',label:'Patrimônio aos 50',data:[2.36,1.22,0.96],backgroundColor:['#4CAF8C','#E8A83C','#E85C4A'],borderRadius:6,barThickness:48},
+        {type:'line',label:'Meta (R$ 2,6 mi)',data:[2.6,2.6,2.6],borderColor:'#C9A84C',borderDash:[6,6],pointRadius:0,fill:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': R$ '+c.parsed.y.toLocaleString('pt-BR')+' mi'}}},
+      scales:{y:{beginAtZero:true,grid:{color:grid},ticks:{callback:v=>'R$ '+v+' mi'}},x:{grid:{display:false}}}}});
+}
+</script>
+</body>
+</html>
